@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SecureBankVerificationSimulator.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CS5004 Assignment</a> &gt; <a href="index.source.html" class="el_package">edu.neu.khoury.cs5004</a> &gt; <span class="el_source">SecureBankVerificationSimulator.java</span></div><h1>SecureBankVerificationSimulator.java</h1><pre class="source lang-java linenums">package edu.neu.khoury.cs5004;
+
+import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Random;
+
+public class SecureBankVerificationSimulator {
+  private Integer numClients;
+  private Integer numVerifications;
+  private double validPercentage;
+  private String outputFile;
+  private HashSet&lt;Client&gt; clients;
+  private Random rnd;
+
+<span class="fc" id="L16">  private static final Integer LOWER_BOUND = 0;</span>
+<span class="fc" id="L17">  private static final Integer CLIENTS_UPPER_BOUND = 50000;</span>
+<span class="fc" id="L18">  private static final Integer VERIFICATION_UPPER_BOUND = 10000;</span>
+<span class="fc" id="L19">  private static final Integer INVALID_MESSAGES_UPPER_BOUND = 1;</span>
+<span class="fc" id="L20">  private static final Integer ID_UPPER_BOUND = 100000;</span>
+<span class="fc" id="L21">  private static final Integer MESSAGE_SIZE_LIMIT = 5000;</span>
+
+  /**
+   * Creates a new verification simulator based on the given parameters.
+   * @param numClients The number of total clients in the system
+   * @param numVerifications The number of transactions, and thus verifications, to process
+   * @param validPercentage The percentage of transactions to simulate being valid
+   * @param outputFile The file to write the results to
+   */
+  public SecureBankVerificationSimulator(Integer numClients,
+<span class="fc" id="L31">      Integer numVerifications, Double validPercentage, String outputFile) {</span>
+<span class="fc" id="L32">    this.checkBound(CLIENTS_UPPER_BOUND, numClients);</span>
+<span class="fc" id="L33">    this.checkBound(VERIFICATION_UPPER_BOUND, numVerifications);</span>
+<span class="fc" id="L34">    this.checkBound(INVALID_MESSAGES_UPPER_BOUND, (int)Math.ceil(validPercentage));</span>
+<span class="fc" id="L35">    rnd = new Random();</span>
+<span class="fc" id="L36">    this.numClients = numClients;</span>
+<span class="fc" id="L37">    this.numVerifications = numVerifications;</span>
+<span class="fc" id="L38">    this.validPercentage = validPercentage;</span>
+<span class="fc" id="L39">    this.outputFile = outputFile;</span>
+<span class="fc" id="L40">  }</span>
+
+  /**
+   * Checks whether the given parameter is within the given upper bound.
+   * @param upperBound The upper bound to check
+   * @param numChecked The number to check against the upper bound
+   * @return Whether the number is within the upper bound
+   */
+  private Boolean checkBound(Integer upperBound, Integer numChecked) {
+<span class="pc bpc" id="L49" title="1 of 4 branches missed.">    if (LOWER_BOUND &gt; numChecked || upperBound &lt; numChecked) {</span>
+<span class="fc" id="L50">      throw new IllegalArgumentException(&quot;Number out of bounds&quot;);</span>
+    } else {
+<span class="fc" id="L52">      return true;</span>
+    }
+  }
+
+  /**
+   * Generates the set of clients randomly, giving them random keys.
+   */
+  private void generateClients() {
+<span class="fc" id="L60">    clients = new HashSet&lt;Client&gt;();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    while (clients.size() &lt; numClients) {</span>
+<span class="fc" id="L62">      Client client = new Client(rnd.nextInt(ID_UPPER_BOUND));</span>
+<span class="fc" id="L63">      clients.add(client);</span>
+<span class="fc" id="L64">    }</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Generates the set of clients first, then generates the
+   * correct number of messages from those clients. Then
+   * verifies the messages, and writes the results to file.
+   */
+  public void generateAndVerifyMessages() {
+<span class="fc" id="L73">    generateClients();</span>
+<span class="fc" id="L74">    int count = 0;</span>
+<span class="fc" id="L75">    ResultsWriter writer = new ResultsWriter(outputFile);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">    for (Client client : clients) {</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">      if (count &gt;= numVerifications) {</span>
+<span class="fc" id="L78">        break;</span>
+      }
+
+      BigInteger signature;
+<span class="fc" id="L82">      Integer messageContents = rnd.nextInt(MESSAGE_SIZE_LIMIT);</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">      if (count &lt; (this.validPercentage * numVerifications)) {</span>
+<span class="fc" id="L85">        signature = client.createSignature(messageContents, true);</span>
+      } else {
+<span class="fc" id="L87">        signature = client.createSignature(messageContents, false);</span>
+      }
+
+<span class="fc" id="L90">      Message message = new Message(messageContents, signature);</span>
+<span class="fc" id="L91">      Boolean verified = message.validateMessage(client);</span>
+<span class="fc" id="L92">      TransactionStatus status = TransactionStatus.WITHDRAWAL_DECLINED;</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">      if (message.isDeposit()) {</span>
+<span class="pc bpc" id="L94" title="1 of 4 branches missed.">        if (verified &amp;&amp; ((message.getMessageContents() / 10) &lt; client.getDepositLimit())) {</span>
+<span class="fc" id="L95">          status = TransactionStatus.DEPOSIT_ACCEPTED;</span>
+        } else {
+<span class="fc" id="L97">          status = TransactionStatus.DEPOSIT_DECLINED;</span>
+        }
+      }
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      if (message.isWithdrawal()) {</span>
+<span class="pc bpc" id="L101" title="2 of 4 branches missed.">        if (verified &amp;&amp; ((message.getMessageContents() / 10) &lt; client.getWithdrawalLimit())) {</span>
+<span class="fc" id="L102">          status = TransactionStatus.WITHDRAWAL_ACCEPTED;</span>
+        } else {
+<span class="nc" id="L104">          status = TransactionStatus.WITHDRAWAL_DECLINED;</span>
+        }
+      }
+<span class="fc" id="L107">      writer.writeData(count, client, message, verified, status);</span>
+<span class="fc" id="L108">      count++;</span>
+<span class="fc" id="L109">    }</span>
+<span class="fc" id="L110">    writer.closeWriter();</span>
+<span class="fc" id="L111">  }</span>
+
+  /**
+   * Returns the number of clients that are in the current set,
+   * or will be once it is created.
+   * @return The number of clients
+   */
+  public Integer getNumClients() {
+<span class="fc" id="L119">    return numClients;</span>
+  }
+
+  /**
+   * The number of messages that will have to be verified, or have
+   * been verified.
+   * @return The number of messages to verify
+   */
+  public Integer getNumVerifications() {
+<span class="fc" id="L128">    return numVerifications;</span>
+  }
+
+  /**
+   * Returns the percentage of messages that will be created, or have
+   * been created, to be valid (vs invalid).
+   * @return The number of valid messages
+   */
+  public double getValidPercentage() {
+<span class="fc" id="L137">    return this.validPercentage;</span>
+  }
+
+  /**
+   * Returns a String representing the name of the output file.
+   * @return The name of the output file
+   */
+  public String getOutputFile() {
+<span class="fc" id="L145">    return outputFile;</span>
+  }
+
+  /**
+   *{@inheritDoc}.
+   */
+  @Override
+  public boolean equals(Object object) {
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">    if (this == object) {</span>
+<span class="nc" id="L154">      return true;</span>
+    }
+<span class="pc bpc" id="L156" title="2 of 4 branches missed.">    if (object == null || getClass() != object.getClass()) {</span>
+<span class="nc" id="L157">      return false;</span>
+    }
+<span class="fc" id="L159">    SecureBankVerificationSimulator that = (SecureBankVerificationSimulator) object;</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">    return Double.compare(that.getValidPercentage(), getValidPercentage()) == 0</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        &amp;&amp; getNumClients().equals(that.getNumClients())</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        &amp;&amp; getNumVerifications().equals(that.getNumVerifications())</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">        &amp;&amp; getOutputFile().equals(that.getOutputFile());</span>
+  }
+
+  /**
+   *{@inheritDoc}.
+   */
+  @Override
+  public int hashCode() {
+<span class="nc" id="L171">    return Objects</span>
+<span class="nc" id="L172">        .hash(getNumClients(), getNumVerifications(), getValidPercentage(), getOutputFile(),</span>
+            clients, rnd);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

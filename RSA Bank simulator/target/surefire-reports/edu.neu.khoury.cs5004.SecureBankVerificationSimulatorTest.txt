@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: edu.neu.khoury.cs5004.SecureBankVerificationSimulatorTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.922 sec

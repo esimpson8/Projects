@@ -1,0 +1,9 @@
+Transaction number, Time, Client ID, Message, Digital signature, Verified, Transaction status
+0, 2019-08-10T12:42, 63378, 4848, 1802594, yes, withdrawal accepted
+1, 2019-08-10T12:42, 64690, 4642, 382246, yes, deposit accepted
+2, 2019-08-10T12:42, 70691, 1773, 3409968, no, deposit declined
+3, 2019-08-10T12:42, 48520, 4453, 470404, yes, deposit accepted
+4, 2019-08-10T12:42, 78391, 2514, 833957, yes, deposit accepted
+5, 2019-08-10T12:42, 53674, 2122, 822799, yes, deposit accepted
+6, 2019-08-10T12:42, 39130, 1800, 1138889, yes, deposit accepted
+7, 2019-08-10T12:42, 99421, 594, 832, no, deposit declined

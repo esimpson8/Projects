@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="5.3.5" timestamp="2019-08-10T12:42:12.656">
+<file name="C:\Users\Nancy\Documents\CS5004\Team_repo_Gabriel_Rada_Evan_Simpson\Assignment9\src\main\java\edu\neu\khoury\cs5004\Client.java">
+<violation beginline="56" endline="56" begincolumn="22" endcolumn="40" rule="BigIntegerInstantiation" ruleset="Basic" package="edu.neu.khoury.cs5004" class="Client" method="generateKeys" externalInfoUrl="https://pmd.github.io/pmd-5.3.5/pmd-java/rules/java/basic.html#BigIntegerInstantiation" priority="3">
+Dont create instances of already existing BigInteger and BigDecimal (ZERO, ONE, TEN)
+</violation>
+</file>
+<file name="C:\Users\Nancy\Documents\CS5004\Team_repo_Gabriel_Rada_Evan_Simpson\Assignment9\src\main\java\edu\neu\khoury\cs5004\ResultsWriter.java">
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="20" rule="UnusedImports" ruleset="Import Statements" package="edu.neu.khoury.cs5004" externalInfoUrl="https://pmd.github.io/pmd-5.3.5/pmd-java/rules/java/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.io.File'
+</violation>
+</file>
+</pmd>
